@@ -4,11 +4,11 @@
   "version": "0.1.0",
   "author": "Jakub Szwacz <jakub@szwacz.com>",
   "dependencies": {
-    "q": "1.0.x"
+    "q": "1.0.x",
+    "fs-jetpack": "0.3.x"
   },
   "devDependencies": {
-    "jasmine-node": "1.14.x",
-    "fs-jetpack": "*"
+    "jasmine-node": "1.14.x"
   },
   "scripts": {
     "test": "node_modules/.bin/jasmine-node spec"
