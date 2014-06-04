@@ -11,7 +11,6 @@ describe('initialization', function () {
     afterEach(utils.afterEach);
 
     var testDir = pathUtil.resolve(utils.workingDir, 'test');
-    console.log(testDir)
 
     it('rejects if storage directory path not specified', function (done) {
         scatteredStore.create()
