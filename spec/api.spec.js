@@ -126,6 +126,16 @@ describe('api', function () {
             });
         });
         
+        it("attempt to delete non-existent key does nothing", function (done) {
+            scatteredStore.create(testDir)
+            .then(function (createdStore) {
+                return createdStore.del('none');
+            })
+            .then(function () {
+                done();
+            });
+        });
+        
         it("can write buffer of length 0", function (done) {
             var store;
             var key = "a";
@@ -149,11 +159,29 @@ describe('api', function () {
     
     describe('unexpected behaviour prevention', function () {
         
+        it("throws if key of length 0", function (done) {
+            var value = { a: "a" };
+            var err = new Error('Unsupported key type.');
+            scatteredStore.create(testDir)
+            .then(function (store) {
+                expect(function () {
+                    store.get('');
+                }).toThrow(err);
+                
+                expect(function () {
+                    store.set('', value);
+                }).toThrow(err);
+                
+                done();
+            });
+        });
+        
         it("throws if key of different type than string", function (done) {
             var value = { a: "a" };
             var err = new Error('Unsupported key type.');
             scatteredStore.create(testDir)
             .then(function (store) {
+                
                 expect(function () {
                     store.get(null);
                 }).toThrow(err);
@@ -173,6 +201,7 @@ describe('api', function () {
                 expect(function () {
                     store.set({}, value);
                 }).toThrow(err);
+                
                 done();
             });
         });
@@ -181,12 +210,14 @@ describe('api', function () {
             var err = new Error('Unsupported value type.');
             scatteredStore.create(testDir)
             .then(function (store) {
+                
                 expect(function () {
                     store.set("a", null);
                 }).toThrow(err);
                 expect(function () {
                     store.set("a", 1);
                 }).toThrow(err);
+                
                 done();
             });
         });
