@@ -16,7 +16,8 @@ describe('api', function () {
         var store;
         var key = "ąż"; // utf8 test
         var value = {
-            a: "ąćłźż" // utf8 test
+            a: "ąćłźż", // utf8 test
+            now: new Date() // can handle date object
         };
         scatteredStore.create(testDir)
         .then(function (createdStore) {
@@ -103,6 +104,47 @@ describe('api', function () {
             expect(valueFromStore).toBe(null);
             done();
         });
+    });
+    
+    describe('edge cases', function () {
+        
+        it("can write empty object", function (done) {
+            var store;
+            var key = "a";
+            var value = {};
+            scatteredStore.create(testDir)
+            .then(function (createdStore) {
+                store = createdStore;
+                return store.set(key, value);
+            })
+            .then(function () {
+                return store.get(key);
+            })
+            .then(function (valueFromStore) {
+                expect(valueFromStore).toEqual({});
+                done();
+            });
+        });
+        
+        it("can write buffer of length 0", function (done) {
+            var store;
+            var key = "a";
+            var value = new Buffer(0);
+            scatteredStore.create(testDir)
+            .then(function (createdStore) {
+                store = createdStore;
+                return store.set(key, value);
+            })
+            .then(function () {
+                return store.get(key);
+            })
+            .then(function (valueFromStore) {
+                expect(Buffer.isBuffer(valueFromStore)).toBe(true);
+                expect(valueFromStore.length).toBe(0);
+                done();
+            });
+        });
+        
     });
     
     describe('unexpected behaviour prevention', function () {
