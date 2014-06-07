@@ -19,8 +19,8 @@ describe('api', function () {
             a: "ąćłźż" // utf8 test
         };
         scatteredStore.create(testDir)
-        .then(function (storeInstance) {
-            store = storeInstance;
+        .then(function (createdStore) {
+            store = createdStore;
             return store.set(key, value);
         })
         .then(function () {
@@ -37,8 +37,8 @@ describe('api', function () {
         var key = "a";
         var value = [1, 2, 3];
         scatteredStore.create(testDir)
-        .then(function (storeInstance) {
-            store = storeInstance;
+        .then(function (createdStore) {
+            store = createdStore;
             return store.set(key, value);
         })
         .then(function () {
@@ -55,8 +55,8 @@ describe('api', function () {
         var key = "a";
         var value = new Buffer([123]);
         scatteredStore.create(testDir)
-        .then(function (storeInstance) {
-            store = storeInstance;
+        .then(function (createdStore) {
+            store = createdStore;
             return store.set(key, value);
         })
         .then(function () {
@@ -75,8 +75,8 @@ describe('api', function () {
         var key = "a";
         var value = { a: "a" };
         scatteredStore.create(testDir)
-        .then(function (storeInstance) {
-            store = storeInstance;
+        .then(function (createdStore) {
+            store = createdStore;
             return store.set(key, value);
         })
         .then(function () {
@@ -95,8 +95,8 @@ describe('api', function () {
         var store;
         var key = "a";
         scatteredStore.create(testDir)
-        .then(function (storeInstance) {
-            store = storeInstance;
+        .then(function (createdStore) {
+            store = createdStore;
             return store.get(key);
         })
         .then(function (valueFromStore) {
@@ -111,7 +111,17 @@ describe('api', function () {
             var value = { a: "a" };
             var err = new Error('Unsupported key type.');
             scatteredStore.create(testDir)
-            .then(function (storeInstance) {
+            .then(function (store) {
+                expect(function () {
+                    store.get(null);
+                }).toThrow(err);
+                expect(function () {
+                    store.get(123);
+                }).toThrow(err);
+                expect(function () {
+                    store.get({});
+                }).toThrow(err);
+                
                 expect(function () {
                     store.set(null, value);
                 }).toThrow(err);
@@ -125,28 +135,10 @@ describe('api', function () {
             });
         });
         
-        it("throws if key contains new line characters", function (done) {
-            var value = { a: "a" };
-            var err = new Error("Key can't contain new line characters.");
-            scatteredStore.create(testDir)
-            .then(function (storeInstance) {
-                expect(function () {
-                    store.set("abc\n", value);
-                }).toThrow(err);
-                expect(function () {
-                    store.set("abc\r", value);
-                }).toThrow(err);
-                expect(function () {
-                    store.set("abc\r\n", value);
-                }).toThrow(err);
-                done();
-            });
-        });
-        
         it("throws if value is of unsupported type", function (done) {
             var err = new Error('Unsupported value type.');
             scatteredStore.create(testDir)
-            .then(function (storeInstance) {
+            .then(function (store) {
                 expect(function () {
                     store.set("a", null);
                 }).toThrow(err);
@@ -168,8 +160,8 @@ describe('api', function () {
             var value2 = { b: "b" };
             var value3 = { c: "c" };
             scatteredStore.create(testDir)
-            .then(function (storeInstance) {
-                store = storeInstance;
+            .then(function (createdStore) {
+                store = createdStore;
                 
                 var order = 0;
                 

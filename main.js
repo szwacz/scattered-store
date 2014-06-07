@@ -4,18 +4,18 @@ var Q = require('q');
 var jetpack = require('fs-jetpack');
 var core = require('./lib/core');
 
-function create(storageDir, options) {
+function create(storageDirPath) {
     var qd = Q.defer();
     
     function done() {
-        qd.resolve(core(storageDir, options));
+        qd.resolve(core(storageDirPath));
     }
     
-    if (typeof storageDir !== 'string' || storageDir.length === 0) {
+    if (typeof storageDirPath !== 'string' || storageDirPath.length === 0) {
         qd.reject(new Error('Path to storage directory not specified.'));
     } else {
         // first check if directory exists
-        jetpack.existsAsync(storageDir)
+        jetpack.existsAsync(storageDirPath)
         .then(function (exists) {
             if (exists === 'file') {
                 qd.reject(new Error('Given path is a file, but directory required.'));
@@ -24,7 +24,7 @@ function create(storageDir, options) {
                 done();
             } else {
                 // dir doesn't exist, so create it
-                jetpack.dirAsync(storageDir)
+                jetpack.dirAsync(storageDirPath)
                 .then(function () {
                     done();
                 }, qd.reject);
