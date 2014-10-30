@@ -4,8 +4,8 @@
   "version": "0.1.0",
   "author": "Jakub Szwacz <jakub@szwacz.com>",
   "dependencies": {
-    "q": "1.0.x",
-    "fs-jetpack": "0.3.x"
+    "q": "1.0.1",
+    "fs-jetpack": "0.5.2"
   },
   "devDependencies": {
     "jasmine-node": "1.14.x"
