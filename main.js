@@ -4,36 +4,33 @@ var Q = require('q');
 var jetpack = require('fs-jetpack');
 var core = require('./lib/core');
 
-function create(storageDirPath) {
-    var qd = Q.defer();
+module.exports.create = function (storageDirPath) {
+    var deferred = Q.defer();
     
-    function done() {
-        qd.resolve(core(storageDirPath));
-    }
+    var done = function() {
+        deferred.resolve(core(storageDirPath));
+    };
     
     if (typeof storageDirPath !== 'string' || storageDirPath.length === 0) {
-        qd.reject(new Error('Path to storage directory not specified.'));
+        deferred.reject(new Error('Path to storage directory not specified.'));
     } else {
-        // first check if directory exists
+        // First check if directory exists
         jetpack.existsAsync(storageDirPath)
         .then(function (exists) {
             if (exists === 'file') {
-                qd.reject(new Error('Given path is a file, but directory required.'));
+                deferred.reject(new Error('Given path is a file, but directory is required for scattered-store to work.'));
             } else if (exists === 'dir') {
-                // dir already exists, we have to do nothing
+                // Directory already exists, so just start
                 done();
             } else {
-                // dir doesn't exist, so create it
+                // Directory doesn't exist, so create it
                 jetpack.dirAsync(storageDirPath)
                 .then(function () {
                     done();
-                }, qd.reject);
+                }, deferred.reject);
             }
-        }, qd.reject);
+        }, deferred.reject);
     }
     
-    return qd.promise;
+    return deferred.promise;
 };
-
-// API
-module.exports.create = create;

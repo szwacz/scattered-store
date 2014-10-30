@@ -33,7 +33,7 @@ describe('initialization', function () {
         jetpack.file(anyFile);
         scatteredStore.create(anyFile)
         .catch(function (err) {
-            expect(err.message).toEqual('Given path is a file, but directory required.');
+            expect(err.message).toEqual('Given path is a file, but directory is required for scattered-store to work.');
             done();
         });
     });
