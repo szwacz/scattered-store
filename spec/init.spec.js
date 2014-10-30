@@ -3,7 +3,7 @@
 describe('initialization', function () {
 
     var scatteredStore = require('..');
-    var utils = require('./specUtils');
+    var utils = require('./utils');
     var pathUtil = require('path');
     var jetpack = require('fs-jetpack');
 
@@ -38,7 +38,7 @@ describe('initialization', function () {
         });
     });
 
-    it("creates storage directory if doesn't exist", function (done) {
+    it("creates storage directory if it doesn't exist", function (done) {
         expect(jetpack.exists(testDir)).toBe(false);
         scatteredStore.create(testDir)
         .then(function () {

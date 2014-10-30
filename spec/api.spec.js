@@ -3,7 +3,7 @@
 describe('api', function () {
 
     var scatteredStore = require('..');
-    var utils = require('./specUtils');
+    var utils = require('./utils');
     var pathUtil = require('path');
     var jetpack = require('fs-jetpack');
 
@@ -71,7 +71,21 @@ describe('api', function () {
         });
     });
     
-    it('can delete value for key', function (done) {
+    it("returns null if key doesn't exist", function (done) {
+        var store;
+        var key = "a";
+        scatteredStore.create(testDir)
+        .then(function (createdStore) {
+            store = createdStore;
+            return store.get(key);
+        })
+        .then(function (valueFromStore) {
+            expect(valueFromStore).toBe(null);
+            done();
+        });
+    });
+    
+    it('can delete value for a key', function (done) {
         var store;
         var key = "a";
         var value = { a: "a" };
@@ -84,20 +98,6 @@ describe('api', function () {
             return store.del(key);
         })
         .then(function () {
-            return store.get(key);
-        })
-        .then(function (valueFromStore) {
-            expect(valueFromStore).toBe(null);
-            done();
-        });
-    });
-    
-    it("returns null if key doesn't exist", function (done) {
-        var store;
-        var key = "a";
-        scatteredStore.create(testDir)
-        .then(function (createdStore) {
-            store = createdStore;
             return store.get(key);
         })
         .then(function (valueFromStore) {
@@ -126,12 +126,20 @@ describe('api', function () {
             });
         });
         
-        it("attempt to delete non-existent key does nothing", function (done) {
+        it("can write empty array", function (done) {
+            var store;
+            var key = "a";
+            var value = [];
             scatteredStore.create(testDir)
             .then(function (createdStore) {
-                return createdStore.del('none');
+                store = createdStore;
+                return store.set(key, value);
             })
             .then(function () {
+                return store.get(key);
+            })
+            .then(function (valueFromStore) {
+                expect(valueFromStore).toEqual([]);
                 done();
             });
         });
@@ -151,6 +159,16 @@ describe('api', function () {
             .then(function (valueFromStore) {
                 expect(Buffer.isBuffer(valueFromStore)).toBe(true);
                 expect(valueFromStore.length).toBe(0);
+                done();
+            });
+        });
+        
+        it("attempt to delete non-existent key does nothing", function (done) {
+            scatteredStore.create(testDir)
+            .then(function (createdStore) {
+                return createdStore.del('none');
+            })
+            .then(function () {
                 done();
             });
         });
