@@ -1,17 +1,36 @@
 "use strict";
 
 describe('api', function () {
-
-    var scatteredStore = require('..');
-    var utils = require('./utils');
+    
+    var _ = require('underscore');
     var pathUtil = require('path');
     var jetpack = require('fs-jetpack');
+    var scatteredStore = require('..');
+    var utils = require('./utils');
 
     beforeEach(utils.beforeEach);
     afterEach(utils.afterEach);
 
     var testDir = pathUtil.resolve(utils.workingDir, 'test');
 
+    it('writes and reads string', function (done) {
+        var store;
+        var key = "ąż"; // utf8 test
+        var value = "ąćłźż"; // utf8 test
+        scatteredStore.create(testDir)
+        .then(function (createdStore) {
+            store = createdStore;
+            return store.set(key, value);
+        })
+        .then(function () {
+            return store.get(key);
+        })
+        .then(function (valueFromStore) {
+            expect(valueFromStore).toEqual(value);
+            done();
+        });
+    });
+    
     it('writes and reads object', function (done) {
         var store;
         var key = "ąż"; // utf8 test
@@ -106,7 +125,68 @@ describe('api', function () {
         });
     });
     
+    describe('each', function () {
+        
+        it('terminates gracefully when store empty', function (done) {
+            scatteredStore.create(testDir)
+            .then(function (store) {
+                return store.each(function (key, value) {});
+            })
+            .then(function () {
+                done();
+            });
+        });
+        
+        it('iterates through all stored entries', function (done) {
+            var store;
+            var eachCallCount = 0;
+            var data = [
+                { key: "a", value: "1" },
+                { key: "b", value: "2" },
+                { key: "c", value: "3" },
+            ];
+            
+            scatteredStore.create(testDir)
+            .then(function (createdStore) {
+                store = createdStore;
+                store.set(data[0].key, data[0].value);
+                store.set(data[1].key, data[1].value);
+                return store.set(data[2].key, data[2].value);
+            })
+            .then(function () {
+                return store.each(function (key, value) {
+                    var item = _.findWhere(data, { key: key, value: value });
+                    expect(item).toBeDefined();
+                    eachCallCount += 1;
+                });
+            })
+            .then(function () {
+                expect(eachCallCount).toBe(data.length);
+                done();
+            });
+        });
+        
+    });
+    
     describe('edge cases', function () {
+        
+        it("can write empty string", function (done) {
+            var store;
+            var key = "a";
+            var value = '';
+            scatteredStore.create(testDir)
+            .then(function (createdStore) {
+                store = createdStore;
+                return store.set(key, value);
+            })
+            .then(function () {
+                return store.get(key);
+            })
+            .then(function (valueFromStore) {
+                expect(valueFromStore).toEqual(value);
+                done();
+            });
+        });
         
         it("can write empty object", function (done) {
             var store;
@@ -224,27 +304,11 @@ describe('api', function () {
             });
         });
         
-        it("throws if value is of unsupported type", function (done) {
-            var err = new Error('Unsupported value type.');
-            scatteredStore.create(testDir)
-            .then(function (store) {
-                
-                expect(function () {
-                    store.set("a", null);
-                }).toThrow(err);
-                expect(function () {
-                    store.set("a", 1);
-                }).toThrow(err);
-                
-                done();
-            });
-        });
-    
     });
     
     describe('concurrency', function () {
         
-        it('does only one operation at a time, puts concurrent operations in the queue', function (done) {
+        it('does only one operation at a time, puts concurrent operations in queue', function (done) {
             var store;
             var key = "a";
             var value1 = { a: "a" };

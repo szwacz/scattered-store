@@ -8,7 +8,8 @@
     "fs-jetpack": "0.5.2"
   },
   "devDependencies": {
-    "jasmine-node": "1.14.x"
+    "jasmine-node": "1.14.x",
+    "underscore": "^1.7.0"
   },
   "scripts": {
     "test": "node_modules/.bin/jasmine-node spec",
