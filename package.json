@@ -11,7 +11,8 @@
     "jasmine-node": "1.14.x"
   },
   "scripts": {
-    "test": "node_modules/.bin/jasmine-node spec"
+    "test": "node_modules/.bin/jasmine-node spec",
+    "benchmark": "node benchmark/benchmark"
   },
   "main": "main.js",
   "homepage": "https://github.com/szwacz/scattered-store",

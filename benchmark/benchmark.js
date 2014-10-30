@@ -6,7 +6,7 @@ var jetpack = require('fs-jetpack');
 
 var path = os.tmpdir() + '/scattered-store-benchmark';
 
-var numberOfOperations = 5000;
+var numberOfOperations = 20000;
 
 var store;
 var startTime;
