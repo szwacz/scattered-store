@@ -7,45 +7,44 @@ var jetpack = require('fs-jetpack');
 var path = os.tmpdir() + '/scattered-store-benchmark';
 
 var numberOfOperations = 20000;
+var itemSize = 1024 * 200;
 
 var store;
 var startTime;
 var keys = [];
-var testObj = {
-    name: "John Doe",
-    age: 123,
-    born: new Date(),
-    likes: ['apple', 'banana']
-};
+var testObj = new Buffer(itemSize);
 
-function generateKey() {
+var generateKey = function () {
     var key = "key" + keys.length.toString();
     keys.push(key);
     return key;
 }
 
-function start(message) {
+var start = function (message) {
     process.stdout.write(message);
     startTime = Date.now();
 }
 
-function stop() {
+var stop = function () {
     var endTime = Date.now();
     var duration = (endTime - startTime) / 1000;
     var opsPerSec = Math.round(numberOfOperations / duration);
-    console.log(opsPerSec + " ops/s");
+    console.log(' ' + opsPerSec + " ops/s");
 }
 
 // clean before benchmark
 jetpack.dir(path, { exists: false });
 
-console.log('Testing scattered-store performance.');
+console.log('Testing scattered-store performance: ' + numberOfOperations +
+            ' items, ' + (itemSize / 1024) + 'KB each, ' +
+            Math.round(numberOfOperations * itemSize / (1024 * 1024)) +
+            'MB combined.');
 
 scatteredStore.create(path)
 .then(function (createdStore) {
     store = createdStore;
     
-    start('Write speed... ');
+    start('set...');
     
     for (var i = 0; i < numberOfOperations; i += 1) {
         store.set(generateKey(), testObj)
@@ -58,7 +57,7 @@ scatteredStore.create(path)
 .then(function () {
     
     stop(); 
-    start('Read speed... ');
+    start('get...');
     
     for (var i = 0; i < keys.length; i += 1) {
         store.get(keys[i])
@@ -68,8 +67,15 @@ scatteredStore.create(path)
 })
 .then(function () {
     
+    stop(); 
+    start('each...');
+    
+    return store.each(function (key, value) {});
+})
+.then(function () {
+    
     stop();
-    start('Deletion speed... ');
+    start('del...');
     
     for (var i = 0; i < keys.length; i += 1) {
         store.del(keys[i])
