@@ -5,7 +5,6 @@
   "author": "Jakub Szwacz <jakub@szwacz.com>",
   "dependencies": {
     "fs-jetpack": "0.5.2",
-    "parallel-transform": "^0.2.2",
     "q": "1.0.1"
   },
   "devDependencies": {
