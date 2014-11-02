@@ -8,10 +8,8 @@ Dead simple key-value store for large datasets in Node.js.
 
 Scattered-store borrows idea for storing data from [Git Objects](http://git-scm.com/book/en/v2/Git-Internals-Git-Objects). Let's say we have code:
 ```js
-scatteredStore.create('my_store') // Name of directory where to store data
-.then(function (store) {
-    store.set('abc', 'Hello World!'); // key: 'abc', value: 'Hello World!'
-});
+var store = scatteredStore.create('my_store'); // Name of directory where to store data
+store.set('abc', 'Hello World!'); // key: 'abc', value: 'Hello World!'
 ```
 The code above stored data in file:
 ```
@@ -32,7 +30,7 @@ Every entry is stored in separate file what means:
 
 ## Cons
 Every entry is stored in separate file what means:
-* If your entry is 10 bytes of data, it still occupies whole block on disk.
+* If the entry is 10 bytes of data, it still occupies whole block on disk.
 * Every operation is a separate I/O. Not much room for performance improvements with batch tasks.
 
 
@@ -47,14 +45,16 @@ npm install scattered-store
 
 ```js
 var scatteredStore = require('scattered-store');
-var store;
 
-scatteredStore.create('path/to/my_store') // Path to directory where to store data
-.then(function (_store_) {
-    // Initiation success!
-    store = _store_;
-    return store.set('abc', 'Hello World!');
-})
+var store = scatteredStore.create('path/to/my/store', function (err) {
+    if (err) {
+        // Oops! Something went wrong with initialization.
+    } else {
+        // Initialization done!
+    }
+});
+
+store.set('abc', 'Hello World!')
 .then(function () {
     return store.get('abc');
 });
