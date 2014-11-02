@@ -125,22 +125,23 @@ describe('api', function () {
         });
     });
     
-    describe('each', function () {
+    describe('get all', function () {
         
         it('terminates gracefully when store empty', function (done) {
             scatteredStore.create(testDir)
-            .then(function (store) {
-                return store.each(function (key, value) {});
-            })
-            .then(function () {
-                done();
+            .then(function (createdStore) {
+                createdStore.all()
+                .on('end', function () {
+                    done();
+                })
+                .resume();
             });
         });
         
         it('iterates through all stored entries', function (done) {
             var store;
-            var eachCallCount = 0;
-            var data = [
+            var count = 0;
+            var dataset = [
                 { key: "a", value: "1" },
                 { key: "b", value: "2" },
                 { key: "c", value: "3" },
@@ -149,20 +150,22 @@ describe('api', function () {
             scatteredStore.create(testDir)
             .then(function (createdStore) {
                 store = createdStore;
-                store.set(data[0].key, data[0].value);
-                store.set(data[1].key, data[1].value);
-                return store.set(data[2].key, data[2].value);
+                store.set(dataset[0].key, dataset[0].value);
+                store.set(dataset[1].key, dataset[1].value);
+                return store.set(dataset[2].key, dataset[2].value);
             })
             .then(function () {
-                return store.each(function (key, value) {
-                    var item = _.findWhere(data, { key: key, value: value });
+                var stream = store.all();
+                stream.on('readable', function () {
+                    var itemFromStore = stream.read();
+                    var item = _.findWhere(dataset, itemFromStore);
                     expect(item).toBeDefined();
-                    eachCallCount += 1;
+                    count += 1;
                 });
-            })
-            .then(function () {
-                expect(eachCallCount).toBe(data.length);
-                done();
+                stream.on('end', function () {
+                    expect(count).toBe(dataset.length);
+                    done();
+                });
             });
         });
         

@@ -1,6 +1,7 @@
 "use strict";
 
 var os = require('os');
+var Q = require('q');
 var scatteredStore = require('..');
 var jetpack = require('fs-jetpack');
 
@@ -68,9 +69,17 @@ scatteredStore.create(path)
 .then(function () {
     
     stop(); 
-    start('each...');
+    start('all...');
     
-    return store.each(function (key, value) {});
+    var deferred = Q.defer();
+    
+    var stream = store.all()
+    .on('readable', function () {
+        stream.read();
+    })
+    .on('end', deferred.resolve);
+    
+    return deferred.promise;
 })
 .then(function () {
     
