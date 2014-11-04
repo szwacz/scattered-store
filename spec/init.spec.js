@@ -14,14 +14,14 @@ describe('initialization', function () {
 
     it('rejects if storage directory path not specified', function (done) {
         scatteredStore.create(undefined, function (err) {
-            expect(err.message).toEqual('Path to storage directory not specified.');
+            expect(err.message).toEqual('Path to storage directory not specified');
             done();
         });
     });
     
     it('rejects if storage directory path empty', function (done) {
         scatteredStore.create('', function (err) {
-            expect(err.message).toEqual('Path to storage directory not specified.');
+            expect(err.message).toEqual('Path to storage directory not specified');
             done();
         });
     });
@@ -30,7 +30,7 @@ describe('initialization', function () {
         var anyFile = pathUtil.resolve(utils.workingDir, 'any.txt');
         jetpack.file(anyFile);
         scatteredStore.create(anyFile, function (err) {
-            expect(err.message).toEqual('Given path is a file, but directory is required for scattered-store to work.');
+            expect(err.message).toEqual('Given path is a file, but directory is required for scattered-store to work');
             done();
         });
     });
