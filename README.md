@@ -54,6 +54,8 @@ var store = scatteredStore.create('path/to/my/store', function (err) {
     }
 });
 
+// You don't have to wait for initialization to be done before calling API methods.
+// All calls will be queued and delayed until initialization is ready.
 store.set('abc', 'Hello World!')
 .then(function () {
     return store.get('abc');

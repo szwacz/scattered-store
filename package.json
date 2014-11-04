@@ -15,7 +15,7 @@
     "test": "node_modules/.bin/jasmine-node spec",
     "benchmark": "node benchmark/benchmark"
   },
-  "main": "main.js",
+  "main": "lib/core.js",
   "homepage": "https://github.com/szwacz/scattered-store",
   "repository": {
     "type": "git",
