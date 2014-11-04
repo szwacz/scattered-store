@@ -101,11 +101,11 @@ describe('api', function () {
         });
     });
     
-    describe('get all', function () {
+    describe('getAll', function () {
         
         it('terminates gracefully when store empty', function (done) {
             scatteredStore.create(testDir)
-            .all()
+            .getAll()
             .on('end', function () {
                 done();
             })
@@ -125,7 +125,7 @@ describe('api', function () {
             store.set(dataset[1].key, dataset[1].value);
             store.set(dataset[2].key, dataset[2].value)
             .then(function () {
-                var stream = store.all();
+                var stream = store.getAll();
                 stream.on('readable', function () {
                     var itemFromStore = stream.read();
                     var item = _.findWhere(dataset, itemFromStore);
