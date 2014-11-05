@@ -10,7 +10,6 @@ var path = os.tmpdir() + '/scattered-store-benchmark';
 var numberOfOperations = 20000;
 var itemSize = 1024 * 50;
 
-var store;
 var startTime;
 var keys = [];
 var testObj = new Buffer(itemSize);
@@ -41,9 +40,13 @@ console.log('Testing scattered-store performance: ' + numberOfOperations +
             Math.round(numberOfOperations * itemSize / (1024 * 1024)) +
             'MB combined.');
 
-scatteredStore.create(path)
-.then(function (createdStore) {
-    store = createdStore;
+var store = scatteredStore.create(path, function (err) {
+    if (!err) {
+        run();
+    }
+});
+
+var run = function () {
     
     start('set...');
     
@@ -53,49 +56,49 @@ scatteredStore.create(path)
     
     // order of operations is preserved,
     // so we know that after finish of this one all are finished
-    return store.set(generateKey(), testObj);
-})
-.then(function () {
-    
-    stop(); 
-    start('get...');
-    
-    for (var i = 0; i < keys.length; i += 1) {
-        store.get(keys[i])
-    }
-    
-    return store.get("none");
-})
-.then(function () {
-    
-    stop(); 
-    start('all...');
-    
-    var deferred = Q.defer();
-    
-    var stream = store.all()
-    .on('readable', function () {
-        stream.read();
+    store.set(generateKey(), testObj)
+    .then(function () {
+        
+        stop(); 
+        start('get...');
+        
+        for (var i = 0; i < keys.length; i += 1) {
+            store.get(keys[i])
+        }
+        
+        return store.get("none");
     })
-    .on('end', deferred.resolve);
-    
-    return deferred.promise;
-})
-.then(function () {
-    
-    stop();
-    start('del...');
-    
-    for (var i = 0; i < keys.length; i += 1) {
-        store.del(keys[i])
-    }
-    
-    return store.del("none");
-})
-.then(function () {
-    
-    stop();
-    
-    // clean after benchmark
-    jetpack.dir(path, { exists: false });
-});
+    .then(function () {
+        
+        stop(); 
+        start('getAll...');
+        
+        var deferred = Q.defer();
+        
+        var stream = store.getAll()
+        .on('readable', function () {
+            stream.read();
+        })
+        .on('end', deferred.resolve);
+        
+        return deferred.promise;
+    })
+    .then(function () {
+        
+        stop();
+        start('delete...');
+        
+        for (var i = 0; i < keys.length; i += 1) {
+            store.delete(keys[i])
+        }
+        
+        return store.delete("none");
+    })
+    .then(function () {
+        
+        stop();
+        
+        // clean after benchmark
+        jetpack.dir(path, { exists: false });
+    });
+};
