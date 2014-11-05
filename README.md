@@ -68,13 +68,13 @@ store.set('abc', 'Hello World!')
 
 # Supported key and value types
 
-As **key** only strings can be used. **Value** could be everything what can be serialized to JSON and any binary data (passed as Buffers). JSON deserialization also automatically turns strings in [ISO notation](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Date/toISOString) into Date objects.
+As **key** only strings can be used. **Value** could be everything what can be serialized to JSON and any binary data (passed as Buffer). JSON deserialization also automatically turns [ISO notation](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Date/toISOString) strings into Date objects.
 
 
 # API
 
 ## set(key, value)
-Stores given `value` on given `key`. As `value` String, Object, Array and Buffer are supported.  
+Stores given `value` on given `key`. String, Object, Array and Buffer are supported as `value`.  
 **Returns:** promise
 
 ```js
