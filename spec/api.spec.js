@@ -141,7 +141,7 @@ describe('api', function () {
             var store = scatteredStore.create(testDir);
             store.set(key, value)
             .then(function () {
-                return store.del(key);
+                return store.delete(key);
             })
             .then(function () {
                 return store.get(key);
@@ -154,7 +154,7 @@ describe('api', function () {
         
         it("attempt to delete non-existent key does nothing", function (done) {
             scatteredStore.create(testDir)
-            .del('none')
+            .delete('none')
             .then(function () {
                 done();
             });
