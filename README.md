@@ -11,7 +11,7 @@ Scattered-store borrows idea for storing data from [Git Objects](http://git-scm.
 var store = scatteredStore.create('my_store'); // Name of directory where to store data
 store.set('abc', 'Hello World!'); // key: 'abc', value: 'Hello World!'
 ```
-The code above stored data in file:
+The code above, when run will store data in file:
 ```
 /my_store/a9/993e364706816aba3e25717850c26c9cd0d89d
 ```
@@ -66,9 +66,79 @@ store.set('abc', 'Hello World!')
 ```
 
 
+# Supported key and value types
+
+As **key** only strings can be used. **Value** could be everything what can be serialized to JSON and any binary data (passed as Buffers). JSON deserialization also automatically turns strings in [ISO notation](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Date/toISOString) into Date objects.
+
+
 # API
 
-TODO
+## set(key, value)
+Stores given `value` on given `key`. As `value` String, Object, Array and Buffer are supported.  
+**Returns:** promise
+
+```js
+store.set('abc', 'Hello World!')
+.then(function () {
+    // Value has been stored!
+});
+```
+
+## get(key)
+Returns value stored on given `key`. If given `key` doesn't exist in database `null` is returned.  
+**Returns:** promise which when resolved returns value
+
+```js
+store.get('abc')
+.then(function (value) {
+    console.log(value); // Hello World!
+});
+```
+
+## getMany(keys)
+As `keys` accepts array of `key` strings, and returns all values for those keys.  
+**Returns:** readable stream
+
+```js
+var stream = store.getMany(["abc", "xyz"]);
+stream.on('readable', function () {
+    var entry = stream.read();
+    console.log(entry);
+    // Every returned entry object has structure: { key: "abc", value: "Hello World!" }
+    // Order of items returned through stream can't be guaranteed!
+});
+stream.on('end', function () {
+    // All entries you asked for has been delivered.
+});
+```
+
+## getAll()
+Returns all data stored in database through stream (one by one).  
+**Returns:** readable stream
+
+```js
+var stream = store.getAll();
+stream.on('readable', function () {
+    var entry = stream.read();
+    console.log(entry);
+    // Every returned entry object has structure: { key: "abc", value: "Hello World!" }
+    // Order of items returned through stream can't be guaranteed!
+});
+stream.on('end', function () {
+    // Everything there was in the database has been delivered.
+});
+```
+
+## delete(key)
+Deletes entry stored on given `key`.  
+**Returns:** promise
+
+```js
+store.delete('abc')
+.then(function () {
+    // Value has been deleted from database!
+});
+```
 
 
 # Performance
@@ -83,8 +153,8 @@ Desktop PC (HDD 7200rpm)
 Testing scattered-store performance: 20000 items, 50KB each, 977MB combined.
 set... 2522 ops/s
 get... 4471 ops/s
-all... 8428 ops/s
-del... 5605 ops/s
+getAll... 8428 ops/s
+delete... 5605 ops/s
 ```
 
 MacBook Pro (SSD)
@@ -92,8 +162,8 @@ MacBook Pro (SSD)
 Testing scattered-store performance: 20000 items, 50KB each, 977MB combined.
 set... 1694 ops/s
 get... 4018 ops/s
-all... 6416 ops/s
-del... 4030 ops/s 
+getAll... 6416 ops/s
+delete... 4030 ops/s 
 ```
 
 Mac Mini (HDD 5400rpm)
@@ -101,6 +171,6 @@ Mac Mini (HDD 5400rpm)
 Testing scattered-store performance: 20000 items, 50KB each, 977MB combined.
 set... 726 ops/s
 get... 3860 ops/s
-all... 5071 ops/s
-del... 1130 ops/s
+getAll... 5071 ops/s
+delete... 1130 ops/s
 ```
