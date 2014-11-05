@@ -216,6 +216,20 @@ describe('api', function () {
             });
         });
         
+        it('gives null for nonexistent key', function (done) {
+            var deliveredItem;
+            var store = scatteredStore.create(testDir);
+            var stream = store.getMany(["nonexistent"]);
+            stream.on('readable', function () {
+                deliveredItem = stream.read();
+                expect(deliveredItem).toEqual({ key: "nonexistent", value: null });
+            });
+            stream.on('end', function () {
+                expect(deliveredItem).toBeDefined();
+                done();
+            });
+        });
+        
     });
     
     describe('getAll', function () {
