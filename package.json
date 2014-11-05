@@ -1,6 +1,6 @@
 {
   "name": "scattered-store",
-  "description": "Dead simple key-value store for large datasets",
+  "description": "Key-value store for large datasets",
   "version": "0.1.0",
   "author": "Jakub Szwacz <jakub@szwacz.com>",
   "keywords": [
