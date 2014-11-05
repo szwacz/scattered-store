@@ -3,6 +3,13 @@
   "description": "Dead simple key-value store for large datasets",
   "version": "0.1.0",
   "author": "Jakub Szwacz <jakub@szwacz.com>",
+  "keywords": [
+    "key-value",
+    "key",
+    "value",
+    "store",
+    "storage"
+  ],
   "dependencies": {
     "fs-jetpack": "0.5.2",
     "q": "1.0.1"
