@@ -151,26 +151,26 @@ Here are results of this test on few machines for comparison:
 Desktop PC (HDD 7200rpm)
 ```
 Testing scattered-store performance: 20000 items, 50KB each, 977MB combined.
-set... 2522 ops/s
-get... 4471 ops/s
-getAll... 8428 ops/s
-delete... 5605 ops/s
+set... 2522 items/s
+get... 4471 items/s
+getAll... 8428 items/s
+delete... 5605 items/s
 ```
 
 MacBook Pro (SSD)
 ```
 Testing scattered-store performance: 20000 items, 50KB each, 977MB combined.
-set... 1694 ops/s
-get... 4018 ops/s
-getAll... 6416 ops/s
-delete... 4030 ops/s 
+set... 1694 items/s
+get... 4018 items/s
+getAll... 6416 items/s
+delete... 4030 items/s 
 ```
 
 Mac Mini (HDD 5400rpm)
 ```
 Testing scattered-store performance: 20000 items, 50KB each, 977MB combined.
-set... 726 ops/s
-get... 3860 ops/s
-getAll... 5071 ops/s
-delete... 1130 ops/s
+set... 726 items/s
+get... 3860 items/s
+getAll... 5071 items/s
+delete... 1130 items/s
 ```

@@ -29,7 +29,7 @@ var stop = function () {
     var endTime = Date.now();
     var duration = (endTime - startTime) / 1000;
     var opsPerSec = Math.round(numberOfOperations / duration);
-    console.log(' ' + opsPerSec + " ops/s");
+    console.log(' ' + opsPerSec + " items/s");
 }
 
 // clean before benchmark
