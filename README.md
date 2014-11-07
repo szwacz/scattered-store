@@ -26,12 +26,12 @@ So every entry is stored in separate file, and all files are scattered across ma
 ## Pros
 Every entry is stored in separate file what means:
 * Implementation is very, very simple. All heavy lifting is done by file system.
-* Dataset can safely grow to ridiculous sizes.
+* Dataset can safely grow to ridiculous size.
 
 ## Cons
 Every entry is stored in separate file what means:
 * If the entry is 10 bytes of data, it still occupies whole block on disk.
-* Every operation is a separate I/O. Not much room for performance improvements with batch tasks.
+* Every operation is a separate I/O. Not much room for performance improvements with bulk tasks.
 
 
 # Installation
