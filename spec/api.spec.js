@@ -335,7 +335,7 @@ describe('api', function () {
     
     describe('preventing data loss', function () {
         
-        it("exposes API to know when it is safe to end the process without dataloss", function (done) {
+        it("whenIdle fires when all tasks done", function (done) {
             var setCallbackFired = false;
             var store = scatteredStore.create(testDir);
             store.set('abc', '123')
@@ -346,6 +346,18 @@ describe('api', function () {
             .then(function () {
                 expect(setCallbackFired).toBe(true);
                 done();
+            });
+        });
+        
+        it("whenIdle is called if already idle", function (done) {
+            var store = scatteredStore.create(testDir, function () {
+                // Wait for next event loop, to make sure nothing at all is happening.
+                setTimeout(function () {
+                    store.whenIdle()
+                    .then(function () {
+                        done();
+                    });
+                }, 0);
             });
         });
         
