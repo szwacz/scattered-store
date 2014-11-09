@@ -332,5 +332,23 @@ describe('api', function () {
         });
         
     });
-
+    
+    describe('preventing data loss', function () {
+        
+        it("exposes API to know when it is safe to end the process without dataloss", function (done) {
+            var setCallbackFired = false;
+            var store = scatteredStore.create(testDir);
+            store.set('abc', '123')
+            .then(function () {
+                setCallbackFired = true;
+            });
+            store.whenIdle()
+            .then(function () {
+                expect(setCallbackFired).toBe(true);
+                done();
+            });
+        });
+        
+    });
+    
 });
