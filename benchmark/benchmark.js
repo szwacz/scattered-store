@@ -13,6 +13,7 @@ var itemSize = 1024 * 50;
 var startTime;
 var keys = [];
 var testObj = new Buffer(itemSize);
+var store;
 
 var generateKey = function () {
     var key = "key" + keys.length.toString();
@@ -32,73 +33,99 @@ var stop = function () {
     console.log(' ' + opsPerSec + " items/s");
 }
 
-// clean before benchmark
-jetpack.dir(path, { exists: false });
-
-console.log('Testing scattered-store performance: ' + numberOfOperations +
-            ' items, ' + (itemSize / 1024) + 'KB each, ' +
-            Math.round(numberOfOperations * itemSize / (1024 * 1024)) +
-            'MB combined.');
-
-var store = scatteredStore.create(path, function (err) {
-    if (!err) {
-        run();
-    }
-});
-
-var run = function () {
+var prepare = function () {
+    var deferred = Q.defer();
     
-    start('set...');
+    jetpack.dir(path, { exists: false });
     
-    for (var i = 0; i < numberOfOperations; i += 1) {
-        store.set(generateKey(), testObj)
-    }
+    console.log('Testing scattered-store performance: ' + numberOfOperations +
+                ' items, ' + (itemSize / 1024) + 'KB each, ' +
+                Math.round(numberOfOperations * itemSize / (1024 * 1024)) +
+                'MB combined.');
     
-    // order of operations is preserved,
-    // so we know that after finish of this one all are finished
-    store.set(generateKey(), testObj)
-    .then(function () {
-        
-        stop(); 
-        start('get...');
-        
-        for (var i = 0; i < keys.length; i += 1) {
-            store.get(keys[i])
+    store = scatteredStore.create(path, function (err) {
+        if (err) {
+            console.log(err);
+            deferred.reject();
+        } else {
+            deferred.resolve();
         }
-        
-        return store.get("none");
-    })
-    .then(function () {
-        
-        stop(); 
-        start('getAll...');
-        
-        var deferred = Q.defer();
-        
-        var stream = store.getAll()
-        .on('readable', function () {
-            stream.read();
-        })
-        .on('end', deferred.resolve);
-        
-        return deferred.promise;
-    })
-    .then(function () {
-        
-        stop();
-        start('delete...');
-        
-        for (var i = 0; i < keys.length; i += 1) {
-            store.delete(keys[i])
-        }
-        
-        return store.delete("none");
-    })
-    .then(function () {
-        
-        stop();
-        
-        // clean after benchmark
-        jetpack.dir(path, { exists: false });
     });
+    
+    return deferred.promise;
 };
+
+var testSet = function () {
+    start('set...');
+    var deferred = Q.defer();
+    var oneMore = function () {
+        if (keys.length < numberOfOperations) {
+            store.set(generateKey(), testObj).then(oneMore, deferred.reject);
+        } else {
+            stop();
+            deferred.resolve();
+        }
+    }
+    oneMore();
+    return deferred.promise;
+};
+
+var testGet = function () {
+    start('get...');
+    var deferred = Q.defer();
+    var i = 0;
+    var oneMore = function () {
+        if (i < keys.length) {
+            store.get(keys[i]).then(oneMore, deferred.reject);
+        } else {
+            stop();
+            deferred.resolve();
+        }
+        i += 1;
+    }
+    oneMore();
+    return deferred.promise;
+};
+
+var testGetAll = function () {
+    start('getAll...');
+    var deferred = Q.defer();
+    var stream = store.getAll()
+    .on('readable', function () {
+        stream.read();
+    })
+    .on('error', deferred.reject)
+    .on('end', function () {
+        stop();
+        deferred.resolve();
+    });
+    return deferred.promise;
+};
+
+var testDelete = function () {
+    start('delete...');
+    var deferred = Q.defer();
+    var i = 0;
+    var oneMore = function () {
+        if (i < keys.length) {
+            store.delete(keys[i]).then(oneMore, deferred.reject);
+        } else {
+            stop();
+            deferred.resolve();
+        }
+        i += 1;
+    }
+    oneMore();
+    return deferred.promise;
+};
+
+var clean = function () {
+    jetpack.dir(path, { exists: false });
+};
+
+prepare()
+.then(testSet)
+.then(testGet)
+.then(testGetAll)
+.then(testDelete)
+.then(clean);
