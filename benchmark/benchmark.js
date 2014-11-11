@@ -7,8 +7,10 @@ var jetpack = require('fs-jetpack');
 var scatteredStore = require('..');
 var store;
 var path = os.tmpdir() + '/scattered-store-benchmark';
-var numberOfOperations = 100000;
-var itemSize = 1024 * 10;
+
+var itemsTotal = 100000;
+var readsPerTest = 10000;
+var itemSize = 1000 * 10;
 
 var keys = [];
 var testObj = new Buffer(itemSize);
@@ -19,15 +21,14 @@ var generateKey = function () {
     return key;
 }
 
-var start = function (message) {
+var start = function (message, totalOps) {
     var startTime = Date.now();
-    var total = numberOfOperations;
-    var done = 0;
+    var doneOps = 0;
     var currPerc;
 
     var progress = function (moreDone) {
-        done += moreDone;
-        var perc = Math.ceil(done / total * 100);
+        doneOps += moreDone;
+        var perc = Math.floor(doneOps / totalOps * 100);
         if (currPerc !== perc) {
             currPerc = perc;
             process.stdout.clearLine();
@@ -39,7 +40,7 @@ var start = function (message) {
     var stop = function () {
         var endTime = Date.now();
         var duration = (endTime - startTime) / 1000;
-        var opsPerSec = Math.round(total / duration);
+        var opsPerSec = Math.round(totalOps / duration);
         process.stdout.clearLine();
         process.stdout.cursorTo(0);
         console.log(message + ' ' + opsPerSec + " items/s");
@@ -58,10 +59,10 @@ var prepare = function () {
 
     jetpack.dir(path, { exists: false });
 
-    console.log('Testing scattered-store performance: ' + numberOfOperations +
-                ' items, ' + (itemSize / 1024) + 'KB each, ' +
-                Math.round(numberOfOperations * itemSize / (1024 * 1024)) +
-                'MB combined.');
+    console.log('Testing scattered-store performance: ' + itemsTotal +
+                ' items, ' + (itemSize / 1000) + 'KB each, ' +
+                (itemsTotal * itemSize / (1000 * 1000 * 1000)).toFixed(1) +
+                'GB combined.');
 
     store = scatteredStore.create(path, function (err) {
         if (err) {
@@ -76,10 +77,10 @@ var prepare = function () {
 };
 
 var testSet = function () {
-    var test = start('set');
+    var test = start('set', itemsTotal);
     var deferred = Q.defer();
     var oneMore = function () {
-        if (keys.length < numberOfOperations) {
+        if (keys.length < itemsTotal) {
             store.set(generateKey(), testObj)
             .then(function () {
                 test.progress(1);
@@ -95,11 +96,11 @@ var testSet = function () {
 };
 
 var testGet = function () {
-    var test = start('get');
+    var test = start('get', readsPerTest);
     var deferred = Q.defer();
     var i = 0;
     var oneMore = function () {
-        if (i < keys.length) {
+        if (i < readsPerTest) {
             store.get(keys[i])
             .then(function () {
                 test.progress(1);
@@ -115,10 +116,10 @@ var testGet = function () {
     return deferred.promise;
 };
 
-var testGetAll = function () {
-    var test = start('getAll');
+var testGetMany = function () {
+    var test = start('getMany', readsPerTest);
     var deferred = Q.defer();
-    var stream = store.getAll()
+    var stream = store.getMany(keys.slice(0, readsPerTest))
     .on('readable', function () {
         stream.read();
         test.progress(1);
@@ -131,8 +132,23 @@ var testGetAll = function () {
     return deferred.promise;
 };
 
+var testGetAll = function () {
+    var test = start('getAll', keys.length);
+    var deferred = Q.defer();
+    var stream = store.getAll()
+    .on('readable', function () {
+        stream.read();
+        test.progress(1);
+    })
+    .on('end', function () {
+        test.stop();
+        deferred.resolve();
+    });
+    return deferred.promise;
+};
+
 var testDelete = function () {
-    var test = start('delete');
+    var test = start('delete', keys.length);
     var deferred = Q.defer();
     var i = 0;
     var oneMore = function () {
@@ -159,6 +175,7 @@ var clean = function () {
 prepare()
 .then(testSet)
 .then(testGet)
+.then(testGetMany)
 .then(testGetAll)
 .then(testDelete)
 .then(clean);
