@@ -2,18 +2,16 @@
 
 var os = require('os');
 var Q = require('q');
-var scatteredStore = require('..');
 var jetpack = require('fs-jetpack');
 
+var scatteredStore = require('..');
+var store;
 var path = os.tmpdir() + '/scattered-store-benchmark';
+var numberOfOperations = 100000;
+var itemSize = 1024 * 10;
 
-var numberOfOperations = 20000;
-var itemSize = 1024 * 50;
-
-var startTime;
 var keys = [];
 var testObj = new Buffer(itemSize);
-var store;
 
 var generateKey = function () {
     var key = "key" + keys.length.toString();
@@ -22,27 +20,49 @@ var generateKey = function () {
 }
 
 var start = function (message) {
-    process.stdout.write(message);
-    startTime = Date.now();
-}
+    var startTime = Date.now();
+    var total = numberOfOperations;
+    var done = 0;
+    var currPerc;
 
-var stop = function () {
-    var endTime = Date.now();
-    var duration = (endTime - startTime) / 1000;
-    var opsPerSec = Math.round(numberOfOperations / duration);
-    console.log(' ' + opsPerSec + " items/s");
+    var progress = function (moreDone) {
+        done += moreDone;
+        var perc = Math.ceil(done / total * 100);
+        if (currPerc !== perc) {
+            currPerc = perc;
+            process.stdout.clearLine();
+            process.stdout.cursorTo(0);
+            process.stdout.write(message + ' [' + currPerc + '%]');
+        }
+    };
+
+    var stop = function () {
+        var endTime = Date.now();
+        var duration = (endTime - startTime) / 1000;
+        var opsPerSec = Math.round(total / duration);
+        process.stdout.clearLine();
+        process.stdout.cursorTo(0);
+        console.log(message + ' ' + opsPerSec + " items/s");
+    };
+
+    progress(0);
+
+    return {
+        progress: progress,
+        stop: stop,
+    }
 }
 
 var prepare = function () {
     var deferred = Q.defer();
-    
+
     jetpack.dir(path, { exists: false });
-    
+
     console.log('Testing scattered-store performance: ' + numberOfOperations +
                 ' items, ' + (itemSize / 1024) + 'KB each, ' +
                 Math.round(numberOfOperations * itemSize / (1024 * 1024)) +
                 'MB combined.');
-    
+
     store = scatteredStore.create(path, function (err) {
         if (err) {
             console.log(err);
@@ -51,18 +71,22 @@ var prepare = function () {
             deferred.resolve();
         }
     });
-    
+
     return deferred.promise;
 };
 
 var testSet = function () {
-    start('set...');
+    var test = start('set');
     var deferred = Q.defer();
     var oneMore = function () {
         if (keys.length < numberOfOperations) {
-            store.set(generateKey(), testObj).then(oneMore, deferred.reject);
+            store.set(generateKey(), testObj)
+            .then(function () {
+                test.progress(1);
+                oneMore();
+            });
         } else {
-            stop();
+            test.stop();
             deferred.resolve();
         }
     }
@@ -71,14 +95,18 @@ var testSet = function () {
 };
 
 var testGet = function () {
-    start('get...');
+    var test = start('get');
     var deferred = Q.defer();
     var i = 0;
     var oneMore = function () {
         if (i < keys.length) {
-            store.get(keys[i]).then(oneMore, deferred.reject);
+            store.get(keys[i])
+            .then(function () {
+                test.progress(1);
+                oneMore();
+            });
         } else {
-            stop();
+            test.stop();
             deferred.resolve();
         }
         i += 1;
@@ -88,29 +116,34 @@ var testGet = function () {
 };
 
 var testGetAll = function () {
-    start('getAll...');
+    var test = start('getAll');
     var deferred = Q.defer();
     var stream = store.getAll()
     .on('readable', function () {
         stream.read();
+        test.progress(1);
     })
     .on('error', deferred.reject)
     .on('end', function () {
-        stop();
+        test.stop();
         deferred.resolve();
     });
     return deferred.promise;
 };
 
 var testDelete = function () {
-    start('delete...');
+    var test = start('delete');
     var deferred = Q.defer();
     var i = 0;
     var oneMore = function () {
         if (i < keys.length) {
-            store.delete(keys[i]).then(oneMore, deferred.reject);
+            store.delete(keys[i])
+            .then(function () {
+                test.progress(1);
+                oneMore();
+            });
         } else {
-            stop();
+            test.stop();
             deferred.resolve();
         }
         i += 1;
