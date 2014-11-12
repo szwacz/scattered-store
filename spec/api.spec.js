@@ -270,28 +270,6 @@ describe('api', function () {
             });
         });
 
-        it('can deal with empty directories inside storage', function (done) {
-            // Manually add empty subdirectory. It could happen if
-            // we deleted all items from there.
-            jetpack.dir(testDir + '/af');
-
-            var count = 0;
-            var store = scatteredStore.create(testDir);
-            store.set('abc', '123')
-            .then(function () {
-                var stream = store.getAll();
-                stream.on('readable', function () {
-                    var itemFromStore = stream.read();
-                    expect(itemFromStore).toEqual({ key: 'abc', value: '123' });
-                    count += 1;
-                });
-                stream.on('end', function () {
-                    expect(count).toBe(1);
-                    done();
-                });
-            });
-        });
-
     });
 
     describe('write edge cases', function () {
