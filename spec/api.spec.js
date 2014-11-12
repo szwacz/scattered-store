@@ -1,7 +1,7 @@
 "use strict";
 
 describe('api', function () {
-    
+
     var _ = require('underscore');
     var pathUtil = require('path');
     var jetpack = require('fs-jetpack');
@@ -12,9 +12,9 @@ describe('api', function () {
     afterEach(utils.afterEach);
 
     var testDir = pathUtil.resolve(utils.workingDir, 'test');
-    
+
     describe('get & set', function () {
-        
+
         it('writes and reads string', function (done) {
             var key = "ąż"; // utf8 test
             var value = "ąćłźż"; // utf8 test
@@ -28,7 +28,7 @@ describe('api', function () {
                 done();
             });
         });
-        
+
         it('writes and reads object', function (done) {
             var key = "ąż"; // utf8 test
             var value = {
@@ -45,7 +45,7 @@ describe('api', function () {
                 done();
             });
         });
-        
+
         it('writes and reads array', function (done) {
             var key = "a";
             var value = [1, 2, 3];
@@ -59,7 +59,7 @@ describe('api', function () {
                 done();
             });
         });
-        
+
         it('writes and reads binary data', function (done) {
             var key = "a";
             var value = new Buffer([123]);
@@ -75,7 +75,7 @@ describe('api', function () {
                 done();
             });
         });
-        
+
         it("returns null if key doesn't exist", function (done) {
             var key = "a";
             var store = scatteredStore.create(testDir);
@@ -85,30 +85,30 @@ describe('api', function () {
                 done();
             });
         });
-        
+
         it("throws if key of length 0", function (done) {
             var value = { a: "a" };
             var err = new Error('Unsupported key type');
             var store = scatteredStore.create(testDir, function () {
                 done();
             })
-            
+
             expect(function () {
                 store.get('');
             }).toThrow(err);
-            
+
             expect(function () {
                 store.set('', value);
             }).toThrow(err);
         });
-        
+
         it("throws if key of different type than string", function (done) {
             var value = { a: "a" };
             var err = new Error('Unsupported key type');
             var store = scatteredStore.create(testDir, function () {
                 done();
             });
-            
+
             expect(function () {
                 store.get(null);
             }).toThrow(err);
@@ -118,7 +118,7 @@ describe('api', function () {
             expect(function () {
                 store.get({});
             }).toThrow(err);
-            
+
             expect(function () {
                 store.set(null, value);
             }).toThrow(err);
@@ -128,13 +128,13 @@ describe('api', function () {
             expect(function () {
                 store.set({}, value);
             }).toThrow(err);
-            
+
         });
-        
+
     });
-    
+
     describe('delete', function () {
-        
+
         it('can delete value for a key', function (done) {
             var key = "a";
             var value = { a: "a" };
@@ -151,7 +151,7 @@ describe('api', function () {
                 done();
             });
         });
-        
+
         it("attempt to delete non-existent key does nothing", function (done) {
             scatteredStore.create(testDir)
             .delete('none')
@@ -159,17 +159,17 @@ describe('api', function () {
                 done();
             });
         });
-        
+
     });
-    
+
     describe('getMany', function () {
-        
+
         it('throws if different argument than array passed', function (done) {
             var err = new Error('Malformed array of keys');
             var store = scatteredStore.create(testDir, function () {
                 done();
             });
-            
+
             expect(function () {
                 store.getMany();
             }).toThrow(err);
@@ -180,7 +180,7 @@ describe('api', function () {
                 store.getMany(['abc', 123]);
             }).toThrow(err);
         });
-        
+
         it('terminates gracefully when empty collection passed', function (done) {
             scatteredStore.create(testDir)
             .getMany([])
@@ -189,14 +189,14 @@ describe('api', function () {
             })
             .resume();
         });
-        
+
         it('gives back entries with passed keys', function (done) {
             var count = 0;
             var dataset = [
                 { key: "a", value: "1" },
                 { key: "c", value: "3" },
             ];
-            
+
             var store = scatteredStore.create(testDir);
             store.set("b", "2"); // Should not be returned, although is in collection.
             store.set(dataset[0].key, dataset[0].value);
@@ -215,7 +215,7 @@ describe('api', function () {
                 });
             });
         });
-        
+
         it('gives null for nonexistent key', function (done) {
             var deliveredItem;
             var store = scatteredStore.create(testDir);
@@ -229,11 +229,11 @@ describe('api', function () {
                 done();
             });
         });
-        
+
     });
-    
+
     describe('getAll', function () {
-        
+
         it('terminates gracefully when store empty', function (done) {
             scatteredStore.create(testDir)
             .getAll()
@@ -242,7 +242,7 @@ describe('api', function () {
             })
             .resume();
         });
-        
+
         it('iterates through all stored entries', function (done) {
             var count = 0;
             var dataset = [
@@ -250,7 +250,7 @@ describe('api', function () {
                 { key: "b", value: "2" },
                 { key: "c", value: "3" },
             ];
-            
+
             var store = scatteredStore.create(testDir);
             store.set(dataset[0].key, dataset[0].value);
             store.set(dataset[1].key, dataset[1].value);
@@ -269,11 +269,33 @@ describe('api', function () {
                 });
             });
         });
-        
+
+        it('can deal with empty directories inside storage', function (done) {
+            // Manually add empty subdirectory. It could happen if
+            // we deleted all items from there.
+            jetpack.dir(testDir + '/af');
+
+            var count = 0;
+            var store = scatteredStore.create(testDir);
+            store.set('abc', '123')
+            .then(function () {
+                var stream = store.getAll();
+                stream.on('readable', function () {
+                    var itemFromStore = stream.read();
+                    expect(itemFromStore).toEqual({ key: 'abc', value: '123' });
+                    count += 1;
+                });
+                stream.on('end', function () {
+                    expect(count).toBe(1);
+                    done();
+                });
+            });
+        });
+
     });
-    
+
     describe('write edge cases', function () {
-        
+
         it("can write empty string", function (done) {
             var key = "a";
             var value = '';
@@ -287,7 +309,7 @@ describe('api', function () {
                 done();
             });
         });
-        
+
         it("can write empty object", function (done) {
             var key = "a";
             var value = {};
@@ -301,7 +323,7 @@ describe('api', function () {
                 done();
             });
         });
-        
+
         it("can write empty array", function (done) {
             var key = "a";
             var value = [];
@@ -315,7 +337,7 @@ describe('api', function () {
                 done();
             });
         });
-        
+
         it("can write buffer of length 0", function (done) {
             var key = "a";
             var value = new Buffer(0);
@@ -330,11 +352,11 @@ describe('api', function () {
                 done();
             });
         });
-        
+
     });
-    
+
     describe('preventing data loss', function () {
-        
+
         it("whenIdle fires when all tasks done", function (done) {
             var setCallbackFired = false;
             var store = scatteredStore.create(testDir);
@@ -348,7 +370,7 @@ describe('api', function () {
                 done();
             });
         });
-        
+
         it("whenIdle is called if already idle", function (done) {
             var store = scatteredStore.create(testDir, function () {
                 // Wait for next event loop, to make sure nothing at all is happening.
@@ -360,7 +382,7 @@ describe('api', function () {
                 }, 0);
             });
         });
-        
+
     });
-    
+
 });
