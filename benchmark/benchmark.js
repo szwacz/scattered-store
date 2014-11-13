@@ -2,6 +2,7 @@
 
 var os = require('os');
 var Q = require('q');
+var _ = require('underscore');
 var jetpack = require('fs-jetpack');
 
 var scatteredStore = require('..');
@@ -10,7 +11,7 @@ var path = os.tmpdir() + '/scattered-store-benchmark';
 
 var itemsTotal = 100000;
 var readsPerTest = 10000;
-var itemSize = 1000 * 10;
+var itemSize = 1000 * 25;
 
 var keys = [];
 var testObj = new Buffer(itemSize);
@@ -88,6 +89,9 @@ var testSet = function () {
             });
         } else {
             test.stop();
+            // After finished insertion shuffle keys array to simulate
+            // random access to stored entries.
+            keys = _.shuffle(keys);
             deferred.resolve();
         }
     }
