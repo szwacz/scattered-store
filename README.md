@@ -141,7 +141,7 @@ store.delete('abc')
 ```
 
 ## whenIdle()
-Hook to know when all queued tasks has been executed and store is idle. Useful e.g. if you want to terminate the process, and want to make sure no dataloss will occur.
+Hook to know when all queued tasks has been executed and store is idle. Useful e.g. if you want to terminate the process, and want to make sure no dataloss will occur.  
 **Returns:** promise
 
 ```js
