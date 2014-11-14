@@ -141,7 +141,7 @@ store.delete('abc')
 ```
 
 ## whenIdle()
-Hook to know when all queued tasks has been executed and store is idle. Useful e.g. if you want to terminate the process, and want to make sure no dataloss will occur.   
+Hook to know when all queued tasks has been executed and store is idle. Useful e.g. if you want to terminate the process, and want to make sure no dataloss will occur.
 **Returns:** promise
 
 ```js
@@ -157,31 +157,28 @@ store.whenIdle()
 ```
 npm run benchmark
 ```
-Here are results of this test on few machines for comparison:
 
-Desktop PC (HDD 7200rpm)
-```
-Testing scattered-store performance: 20000 items, 50KB each, 977MB combined.
-set... 2522 items/s
-get... 4471 items/s
-getAll... 8428 items/s
-delete... 5605 items/s
-```
+Here are results of this test on MacBook Pro with SSD. Tested with 10K, 100K and 1M items in store.
 
-MacBook Pro (SSD)
 ```
-Testing scattered-store performance: 20000 items, 50KB each, 977MB combined.
-set... 1694 items/s
-get... 4018 items/s
-getAll... 6416 items/s
-delete... 4030 items/s 
-```
+Testing scattered-store performance: 10000 items, 25KB each, 0.3GB combined.
+set 1737 items/s
+get 4170 items/s
+getMany 7018 items/s
+getAll 6817 items/s
+delete 4073 items/s
 
-Mac Mini (HDD 5400rpm)
-```
-Testing scattered-store performance: 20000 items, 50KB each, 977MB combined.
-set... 726 items/s
-get... 3860 items/s
-getAll... 5071 items/s
-delete... 1130 items/s
+Testing scattered-store performance: 100000 items, 25KB each, 2.5GB combined.
+set 1684 items/s
+get 3926 items/s
+getMany 6671 items/s
+getAll 6644 items/s
+delete 3733 items/s
+
+Testing scattered-store performance: 1000000 items, 25KB each, 25.0GB combined.
+set 1132 items/s
+get 1259 items/s
+getMany 5139 items/s
+getAll 3574 items/s
+delete 1348 items/s
 ```
