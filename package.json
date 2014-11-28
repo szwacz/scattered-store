@@ -15,11 +15,11 @@
     "q": "1.0.1"
   },
   "devDependencies": {
-    "jasmine-node": "1.14.x",
+    "jasmine": "^2.1.0",
     "underscore": "^1.7.0"
   },
   "scripts": {
-    "test": "node_modules/.bin/jasmine-node spec",
+    "test": "node_modules/.bin/jasmine",
     "benchmark": "node benchmark/benchmark"
   },
   "main": "lib/core.js",
