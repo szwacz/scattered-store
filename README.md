@@ -3,6 +3,13 @@ scattered-store
 
 Dead simple key-value store for large datasets in Node.js.
 
+### In what cases it can be useful?
+- For some reason you can't or don't want to use serious database engine.
+- For archiving data (you have a lot of rarely accessed data).
+
+### How much data it can handle?
+I would draw the line of sanity around 10M items in store, and max size of one item around 10MB. However only your disk size and used file system are real limitations.
+
 
 # Way of storing data
 
@@ -23,15 +30,15 @@ And the algorithm went as follows:
 
 So every entry is stored in separate file, and all files are scattered across maximum of 256 directories (two hex characters) to overcome limit of files per one directory. That's why it's called *scattered-store*.
 
-## Pros
-Every entry is stored in separate file what means:
+### Pros
+Every entry is stored in separate file what means...
 * Implementation is very, very simple. All heavy lifting is done by file system.
-* Dataset can safely grow to ridiculous size.
+* Quite linear performance with growing dataset.
 
-## Cons
-Every entry is stored in separate file what means:
+### Cons
+Every entry is stored in separate file what means...
 * If the entry is 10 bytes of data, it still occupies whole block on disk.
-* Every operation is a separate I/O. Not much room for performance improvements with bulk tasks.
+* Every operation is performed as separate I/O. Can't speed things up very much with bulk inserts or reads.
 
 
 # Installation
@@ -47,15 +54,17 @@ npm install scattered-store
 var scatteredStore = require('scattered-store');
 
 var store = scatteredStore.create('path/to/my/store', function (err) {
+    // This is optional callback function so you can know 
+    // when the initialization is done.
     if (err) {
-        // Oops! Something went wrong with initialization.
+        // Oops! Something went wrong.
     } else {
         // Initialization done!
     }
 });
 
-// You don't have to wait for initialization to be done before calling API methods.
-// All calls will be queued and delayed until initialization is ready.
+// You don't have to wait for initialization to end before calling API methods.
+// All calls will be queued and delayed automatically.
 store.set('abc', 'Hello World!')
 .then(function () {
     return store.get('abc');
@@ -85,7 +94,7 @@ store.set('abc', 'Hello World!')
 ```
 
 ## get(key)
-Returns value stored on given `key`. If given `key` doesn't exist in database `null` is returned.  
+Returns value stored on given `key`. If given `key` doesn't exist `null` is returned.  
 **Returns:** promise which when resolved returns value
 
 ```js
@@ -108,7 +117,7 @@ stream.on('readable', function () {
     // Order of items returned through stream can't be guaranteed!
 });
 stream.on('end', function () {
-    // All entries you asked for has been delivered.
+    // All entries you asked for had been delivered.
 });
 ```
 
