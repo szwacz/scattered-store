@@ -3,11 +3,11 @@ scattered-store
 
 Dead simple key-value store for large datasets in Node.js.
 
-### In what cases it can be useful?
+### In what cases can it be useful?
 - For some reason you can't or don't want to use serious database engine.
 - For archiving data (you have a lot of rarely accessed data).
 
-### How much data it can handle?
+### How much data can it handle?
 I would draw the line of sanity around 10M items in store, and max size of one item around 10MB. However only your disk size and used file system are real limitations.
 
 
