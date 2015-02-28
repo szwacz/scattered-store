@@ -54,7 +54,7 @@ npm install scattered-store
 var scatteredStore = require('scattered-store');
 
 var store = scatteredStore.create('path/to/my/store', function (err) {
-    // This is optional callback function so you can know 
+    // This is optional callback function so you can know
     // when the initialization is done.
     if (err) {
         // Oops! Something went wrong.
@@ -95,7 +95,7 @@ store.set('abc', 'Hello World!')
 
 ## get(key)
 Returns value stored on given `key`. If given `key` doesn't exist `null` is returned.  
-**Returns:** promise which when resolved returns value
+**Returns:** promise
 
 ```js
 store.get('abc')
