@@ -58,7 +58,7 @@ var start = function (message, totalOps) {
 var prepare = function () {
     var deferred = Q.defer();
 
-    jetpack.dir(path, { exists: false });
+    jetpack.remove(path);
 
     console.log('Testing scattered-store performance: ' + itemsTotal +
                 ' items, ' + (itemSize / 1000) + 'KB each, ' +
@@ -173,7 +173,7 @@ var testDelete = function () {
 };
 
 var clean = function () {
-    jetpack.dir(path, { exists: false });
+    jetpack.remove(path);
 };
 
 prepare()
