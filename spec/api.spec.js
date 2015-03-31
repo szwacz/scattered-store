@@ -205,9 +205,11 @@ describe('api', function () {
                 var stream = store.getMany(["a", "c"]);
                 stream.on('readable', function () {
                     var itemFromStore = stream.read();
-                    var item = _.findWhere(dataset, itemFromStore);
-                    expect(item).toBeDefined();
-                    count += 1;
+                    if (itemFromStore !== null) {
+                        var item = _.findWhere(dataset, itemFromStore);
+                        expect(item).toBeDefined();
+                        count += 1;
+                    }
                 });
                 stream.on('end', function () {
                     expect(count).toBe(dataset.length);
@@ -221,8 +223,11 @@ describe('api', function () {
             var store = scatteredStore.create(testDir);
             var stream = store.getMany(["nonexistent"]);
             stream.on('readable', function () {
-                deliveredItem = stream.read();
-                expect(deliveredItem).toEqual({ key: "nonexistent", value: null });
+                var data = stream.read();
+                if (data !== null) {
+                    deliveredItem = data;
+                    expect(deliveredItem).toEqual({ key: "nonexistent", value: null });
+                }
             });
             stream.on('end', function () {
                 expect(deliveredItem).toBeDefined();
@@ -259,9 +264,11 @@ describe('api', function () {
                 var stream = store.getAll();
                 stream.on('readable', function () {
                     var itemFromStore = stream.read();
-                    var item = _.findWhere(dataset, itemFromStore);
-                    expect(item).toBeDefined();
-                    count += 1;
+                    if (itemFromStore) {
+                        var item = _.findWhere(dataset, itemFromStore);
+                        expect(item).toBeDefined();
+                        count += 1;
+                    }
                 });
                 stream.on('end', function () {
                     expect(count).toBe(dataset.length);

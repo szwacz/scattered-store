@@ -1,6 +1,6 @@
 "use strict";
 
-describe('the way data is stored', function () {
+describe('persistence', function () {
 
     var _ = require('underscore');
     var pathUtil = require('path');
@@ -36,8 +36,10 @@ describe('the way data is stored', function () {
             var stream = store.getAll();
             stream.on('readable', function () {
                 var itemFromStore = stream.read();
-                expect(itemFromStore).toEqual({ key: 'abc', value: '123' });
-                count += 1;
+                if (itemFromStore !== null) {
+                    expect(itemFromStore).toEqual({ key: 'abc', value: '123' });
+                    count += 1;
+                }
             });
             stream.on('end', function () {
                 expect(count).toBe(1);
