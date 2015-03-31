@@ -171,21 +171,21 @@ Here are results of this test on MacBook Pro with SSD. Tested with 10K, 100K and
 
 ```
 Testing scattered-store performance: 10000 items, 25KB each, 0.3GB combined.
-set 1737 items/s
+set 2106 items/s
 get 4170 items/s
 getMany 7018 items/s
 getAll 6817 items/s
 delete 4073 items/s
 
 Testing scattered-store performance: 100000 items, 25KB each, 2.5GB combined.
-set 1684 items/s
+set 1926 items/s
 get 3926 items/s
 getMany 6671 items/s
 getAll 6644 items/s
 delete 3733 items/s
 
 Testing scattered-store performance: 1000000 items, 25KB each, 25.0GB combined.
-set 1132 items/s
+set 1255 items/s
 get 1259 items/s
 getMany 5139 items/s
 getAll 3574 items/s
