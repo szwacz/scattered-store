@@ -15,13 +15,26 @@
     "q": "1.0.1"
   },
   "devDependencies": {
+    "eslint": "^3.12.0",
+    "eslint-config-decent-code": "szwacz/eslint-config-decent-code",
     "jasmine": "^2.1.0",
+    "lint-staged": "^3.3.1",
+    "pre-commit": "^1.2.2",
     "underscore": "^1.7.0"
   },
   "scripts": {
     "test": "node_modules/.bin/jasmine",
-    "benchmark": "node benchmark/benchmark"
+    "benchmark": "node benchmark/benchmark",
+    "lint": "eslint .",
+    "lint-staged": "lint-staged"
   },
+  "lint-staged": {
+    "*.js": "eslint"
+  },
+  "pre-commit": [
+    "test",
+    "lint-staged"
+  ],
   "main": "lib/core.js",
   "homepage": "https://github.com/szwacz/scattered-store",
   "repository": {
