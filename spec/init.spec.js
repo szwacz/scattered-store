@@ -1,47 +1,45 @@
-"use strict";
+/* eslint-env jasmine */
 
-describe('initialization', function () {
+const scatteredStore = require('..');
+const utils = require('./utils');
+const pathUtil = require('path');
+const jetpack = require('fs-jetpack');
 
-    var scatteredStore = require('..');
-    var utils = require('./utils');
-    var pathUtil = require('path');
-    var jetpack = require('fs-jetpack');
+describe('initialization', () => {
+  beforeEach(utils.beforeEach);
+  afterEach(utils.afterEach);
 
-    beforeEach(utils.beforeEach);
-    afterEach(utils.afterEach);
+  const testDir = pathUtil.resolve(utils.workingDir, 'test');
 
-    var testDir = pathUtil.resolve(utils.workingDir, 'test');
-
-    it('rejects if storage directory path not specified', function (done) {
-        scatteredStore.create(undefined, function (err) {
-            expect(err.message).toEqual('Path to storage directory not specified');
-            done();
-        });
+  it('rejects if storage directory path not specified', (done) => {
+    scatteredStore.create(undefined, (err) => {
+      expect(err.message).toEqual('Path to storage directory not specified');
+      done();
     });
-    
-    it('rejects if storage directory path empty', function (done) {
-        scatteredStore.create('', function (err) {
-            expect(err.message).toEqual('Path to storage directory not specified');
-            done();
-        });
-    });
-    
-    it('rejects if storage path is a file', function (done) {
-        var anyFile = pathUtil.resolve(utils.workingDir, 'any.txt');
-        jetpack.file(anyFile);
-        scatteredStore.create(anyFile, function (err) {
-            expect(err.message).toEqual('Given path is a file, but directory is required for scattered-store to work');
-            done();
-        });
-    });
+  });
 
-    it("creates storage directory if it doesn't exist", function (done) {
-        expect(jetpack.exists(testDir)).toBe(false);
-        scatteredStore.create(testDir, function (err) {
-            expect(err).toBeUndefined();
-            expect(jetpack.exists(testDir)).toBe('dir');
-            done();
-        });
+  it('rejects if storage directory path empty', (done) => {
+    scatteredStore.create('', (err) => {
+      expect(err.message).toEqual('Path to storage directory not specified');
+      done();
     });
+  });
 
+  it('rejects if storage path is a file', (done) => {
+    const anyFile = pathUtil.resolve(utils.workingDir, 'any.txt');
+    jetpack.file(anyFile);
+    scatteredStore.create(anyFile, (err) => {
+      expect(err.message).toEqual('Given path is a file, but directory is required for scattered-store to work');
+      done();
+    });
+  });
+
+  it("creates storage directory if it doesn't exist", (done) => {
+    expect(jetpack.exists(testDir)).toBe(false);
+    scatteredStore.create(testDir, (err) => {
+      expect(err).toBeUndefined();
+      expect(jetpack.exists(testDir)).toBe('dir');
+      done();
+    });
+  });
 });
