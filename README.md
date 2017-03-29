@@ -15,7 +15,7 @@ I would draw the line of sanity around 10M items in store, and max size of one i
 
 Scattered-store borrows idea for storing data from [Git Objects](http://git-scm.com/book/en/v2/Git-Internals-Git-Objects). Let's say we have code:
 ```js
-var store = scatteredStore.create('my_store'); // Name of directory where to store data
+const store = scatteredStore.create('my_store'); // Name of directory where to store data
 store.set('abc', 'Hello World!'); // key: 'abc', value: 'Hello World!'
 ```
 The code above, when run will store data in file:
@@ -51,26 +51,26 @@ npm install scattered-store
 # Usage
 
 ```js
-var scatteredStore = require('scattered-store');
+const scatteredStore = require('scattered-store');
 
-var store = scatteredStore.create('path/to/my/store', function (err) {
-    // This is optional callback function so you can know
-    // when the initialization is done.
-    if (err) {
-        // Oops! Something went wrong.
-    } else {
-        // Initialization done!
-    }
+const store = scatteredStore.create('path/to/my/store', (err) => {
+  // This is optional callback function so you can know
+  // when the initialization is done.
+  if (err) {
+    // Oops! Something went wrong.
+  } else {
+    // Initialization done!
+  }
 });
 
 // You don't have to wait for initialization to end before calling API methods.
 // All calls will be queued and delayed automatically.
 store.set('abc', 'Hello World!')
-.then(function () {
-    return store.get('abc');
+.then(() => {
+  return store.get('abc');
 });
-.then(function (value) {
-    console.log(value); // Hello World!
+.then((value) => {
+  console.log(value); // Hello World!
 })
 ```
 
@@ -88,8 +88,8 @@ Stores given `value` on given `key`. String, Object, Array and Buffer are suppor
 
 ```js
 store.set('abc', 'Hello World!')
-.then(function () {
-    // Value has been stored!
+.then(() => {
+  // Value has been stored!
 });
 ```
 
@@ -99,8 +99,8 @@ Returns value stored on given `key`. If given `key` doesn't exist `null` is retu
 
 ```js
 store.get('abc')
-.then(function (value) {
-    console.log(value); // Hello World!
+.then((value) => {
+  console.log(value); // Hello World!
 });
 ```
 
@@ -109,15 +109,15 @@ As `keys` accepts array of `key` strings, and returns all values for those keys.
 **Returns:** readable stream
 
 ```js
-var stream = store.getMany(["abc", "xyz"]);
-stream.on('readable', function () {
-    var entry = stream.read();
-    console.log(entry);
-    // Every returned entry object has structure: { key: "abc", value: "Hello World!" }
-    // Order of items returned through stream can't be guaranteed!
+const stream = store.getMany(['abc', 'xyz']);
+stream.on('readable', () => {
+  const entry = stream.read();
+  console.log(entry);
+  // Every returned entry object has structure: { key: "abc", value: "Hello World!" }
+  // Order of items returned through stream can't be guaranteed!
 });
-stream.on('end', function () {
-    // All entries you asked for had been delivered.
+stream.on('end', () => {
+  // All entries you asked for had been delivered.
 });
 ```
 
@@ -126,15 +126,15 @@ Returns all data stored in database through stream (one by one).
 **Returns:** readable stream
 
 ```js
-var stream = store.getAll();
-stream.on('readable', function () {
-    var entry = stream.read();
-    console.log(entry);
-    // Every returned entry object has structure: { key: "abc", value: "Hello World!" }
-    // Order of items returned through stream can't be guaranteed!
+const stream = store.getAll();
+stream.on('readable', () => {
+  const entry = stream.read();
+  console.log(entry);
+  // Every returned entry object has structure: { key: "abc", value: "Hello World!" }
+  // Order of items returned through stream can't be guaranteed!
 });
-stream.on('end', function () {
-    // Everything there was in the database has been delivered.
+stream.on('end', () => {
+  // Everything there was in the database has been delivered.
 });
 ```
 
@@ -144,8 +144,8 @@ Deletes entry stored on given `key`.
 
 ```js
 store.delete('abc')
-.then(function () {
-    // Value has been deleted from database!
+.then(() => {
+  // Value has been deleted from database!
 });
 ```
 
@@ -155,8 +155,8 @@ Hook to know when all queued tasks has been executed and store is idle. Useful e
 
 ```js
 store.whenIdle()
-.then(function () {
-    // Idle now.
+.then(() => {
+  // Idle now.
 });
 ```
 
