@@ -4,7 +4,7 @@ const jetpack = require('fs-jetpack');
 const pathUtil = require('path');
 const os = require('os');
 
-jasmine.getEnv().defaultTimeoutInterval = 500;
+jasmine.DEFAULT_TIMEOUT_INTERVAL = 500;
 
 // Work in default temporary location for this OS.
 const workingDir = pathUtil.join(os.tmpdir(), 'scattered-store-test');
@@ -18,5 +18,5 @@ module.exports.beforeEach = function () {
 
 module.exports.afterEach = function () {
   // Delete working directory.
-  jetpack.dir(workingDir, { exists: false });
+  jetpack.dir(workingDir).remove();
 };
