@@ -13,8 +13,8 @@ describe('api', () => {
 
   describe('get & set', () => {
     it('writes and reads string', (done) => {
-      const key = 'ąż'; // utf8 test
-      const value = 'ąćłźż'; // utf8 test
+      const key = 'abc';
+      const value = 'xyz';
       const store = scatteredStore.create(testDir);
       store.set(key, value)
       .then(() => {
@@ -27,9 +27,9 @@ describe('api', () => {
     });
 
     it('writes and reads object', (done) => {
-      const key = 'ąż'; // utf8 test
+      const key = 'abc';
       const value = {
-        a: 'ąćłźż', // utf8 test
+        abc: 'xyz',
         now: new Date(), // can handle date object
       };
       const store = scatteredStore.create(testDir);
@@ -44,7 +44,7 @@ describe('api', () => {
     });
 
     it('writes and reads array', (done) => {
-      const key = 'a';
+      const key = 'abc';
       const value = [1, 2, 3];
       const store = scatteredStore.create(testDir);
       store.set(key, value)
@@ -58,7 +58,7 @@ describe('api', () => {
     });
 
     it('writes and reads binary data', (done) => {
-      const key = 'a';
+      const key = 'abc';
       const value = new Buffer([123]);
       const store = scatteredStore.create(testDir);
       store.set(key, value)
@@ -74,7 +74,7 @@ describe('api', () => {
     });
 
     it("returns null if key doesn't exist", (done) => {
-      const key = 'a';
+      const key = 'abc';
       const store = scatteredStore.create(testDir);
       store.get(key)
       .then((valueFromStore) => {
@@ -84,7 +84,6 @@ describe('api', () => {
     });
 
     it('throws if key of length 0', (done) => {
-      const value = { a: 'a' };
       const err = new Error('Unsupported key type');
       const store = scatteredStore.create(testDir, () => {
         done();
@@ -95,12 +94,12 @@ describe('api', () => {
       }).toThrow(err);
 
       expect(() => {
-        store.set('', value);
+        store.set('', { a: 'b' });
       }).toThrow(err);
     });
 
     it('throws if key of different type than string', (done) => {
-      const value = { a: 'a' };
+      const value = { abc: 'xyz' };
       const err = new Error('Unsupported key type');
       const store = scatteredStore.create(testDir, () => {
         done();
@@ -130,8 +129,8 @@ describe('api', () => {
 
   describe('delete', () => {
     it('can delete value for a key', (done) => {
-      const key = 'a';
-      const value = { a: 'a' };
+      const key = 'abc';
+      const value = { foo: 'xyz' };
       const store = scatteredStore.create(testDir);
       store.set(key, value)
       .then(() => {
