@@ -11,7 +11,7 @@ let store;
 
 const itemsTotal = 100000;
 const readsPerTest = 10000;
-const itemSize = 1000 * 25;
+const itemSize = 1000 * 50;
 
 let keys = [];
 const testObj = new Buffer(itemSize);

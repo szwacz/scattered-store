@@ -167,27 +167,27 @@ store.whenIdle()
 npm run benchmark
 ```
 
-Here are results of this test on MacBook Pro with SSD. Tested with 10K, 100K and 1M items in store.
+Here are results of this test performed on MacBook Pro 2015. Tested with 10K, 100K and 1M items in store.
 
 ```
-Testing scattered-store performance: 10000 items, 25KB each, 0.3GB combined.
-set 2106 items/s
-get 4170 items/s
-getMany 7018 items/s
-getAll 6817 items/s
-delete 4073 items/s
+10,000 items 50KB each, 500MB combined
+set 1127 items/s
+get 2392 items/s
+getMany 4274 items/s
+getAll 4988 items/s
+delete 2347 items/s
 
-Testing scattered-store performance: 100000 items, 25KB each, 2.5GB combined.
-set 1926 items/s
-get 3926 items/s
-getMany 6671 items/s
-getAll 6644 items/s
-delete 3733 items/s
+100,000 items 50KB each, 5GB combined
+set 1130 items/s
+get 1283 items/s
+getMany 2649 items/s
+getAll 2819 items/s
+delete 2436 items/s
 
-Testing scattered-store performance: 1000000 items, 25KB each, 25.0GB combined.
-set 1255 items/s
-get 1259 items/s
-getMany 5139 items/s
-getAll 3574 items/s
-delete 1348 items/s
+1,000,000 items 50KB each, 50GB combined
+set 884 items/s
+get 591 items/s
+getMany 2028 items/s
+getAll 2203 items/s
+delete 1166 items/s
 ```
