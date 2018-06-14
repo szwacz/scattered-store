@@ -15,10 +15,7 @@
     "q": "^1.5.0"
   },
   "devDependencies": {
-    "eslint": "^3.12.0",
-    "eslint-config-decent-code": "szwacz/eslint-config-decent-code",
     "jasmine": "^2.1.0",
-    "lint-staged": "^3.3.1",
     "pre-commit": "^1.2.2",
     "release-assist": "^1.0.1",
     "underscore": "^1.7.0"
@@ -30,12 +27,8 @@
     "url": "https://github.com/szwacz/scattered-store.git"
   },
   "licence": "MIT",
-  "lint-staged": {
-    "*.js": "eslint"
-  },
   "pre-commit": [
-    "test",
-    "lint-staged"
+    "test"
   ],
   "scripts": {
     "test": "node_modules/.bin/jasmine",
